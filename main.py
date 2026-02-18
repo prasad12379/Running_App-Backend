@@ -33,16 +33,19 @@ app = FastAPI(title="Fitness Gemini Chatbot")
 # =========================
 
 firebase_json = os.getenv("FIREBASE_CREDENTIALS")
-
 cred_dict = json.loads(firebase_json)
 cred = credentials.Certificate(cred_dict)
 
-firebase_admin.initialize_app(cred)
-firebase_admin.initialize_app(cred, {
-    "databaseURL": "https://calorix-3939c-default-rtdb.firebaseio.com/"
-})
+# ✅ SAFE INITIALIZATION
+if not firebase_admin._apps:
+    firebase_admin.initialize_app(cred, {
+        "databaseURL": "https://calorix-3939c-default-rtdb.firebaseio.com/"
+    })
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto"
+)
 
 
 # =========================
