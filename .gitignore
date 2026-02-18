@@ -1,0 +1,9 @@
+# Environment variables
+.env
+
+# Firebase / Google service account key
+serviceAccountKey.json
+
+# Optional (good practice)
+*.env
+*.json
