@@ -9,6 +9,8 @@ from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
+import json
+
 
 # =========================
 # Load ENV
@@ -30,8 +32,12 @@ app = FastAPI(title="Fitness Gemini Chatbot")
 # 🔥 Firebase Setup (NEW)
 # =========================
 
-cred = credentials.Certificate("serviceAccountKey.json")
+firebase_json = os.getenv("FIREBASE_CREDENTIALS")
 
+cred_dict = json.loads(firebase_json)
+cred = credentials.Certificate(cred_dict)
+
+firebase_admin.initialize_app(cred)
 firebase_admin.initialize_app(cred, {
     "databaseURL": "https://calorix-3939c-default-rtdb.firebaseio.com/"
 })
