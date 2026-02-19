@@ -8,6 +8,7 @@ from firebase_admin import credentials, db
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
+from fastapi import Query
 
 import json
 
@@ -223,4 +224,26 @@ async def signin(user: SigninRequest):
         "user_id": safe_email,
         "name": user_data.get("name"),
         "email": user_data.get("email")
+    }
+
+
+@app.get("/user")
+async def get_user(email: str = Query(...)):
+
+    # convert email → safe firebase key
+    safe_email = make_safe_email(email)
+
+    ref = db.reference(f"Users/{safe_email}")
+    user_data = ref.get()
+
+    # ❌ user not found
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # ⚠️ NEVER send password hash to frontend
+    user_data.pop("password_hash", None)
+
+    return {
+        "message": "User data fetched successfully",
+        "data": user_data
     }
