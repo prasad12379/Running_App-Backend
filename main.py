@@ -289,3 +289,37 @@ async def save_activity(activity: ActivityRequest):
     ref.push(new_activity)
 
     return {"message": "Workout saved successfully"}
+
+
+# =========================
+# 📥 GET USER ACTIVITIES
+# =========================
+
+@app.get("/activities/{email}")
+async def get_activities(email: str):
+
+    safe_email = make_safe_email(email)
+
+    ref = db.reference(f"Users/{safe_email}/activity")
+    data = ref.get()
+
+    # If no activities
+    if not data:
+        return {
+            "message": "No activities found",
+            "data": []
+        }
+
+    activity_list = []
+
+    # Firebase push() creates random keys → convert dict to list
+    for key, value in data.items():
+        activity_list.append(value)
+
+    # OPTIONAL: newest first
+    activity_list.reverse()
+
+    return {
+        "message": "Activities fetched successfully",
+        "data": activity_list
+    }
