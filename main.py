@@ -247,3 +247,45 @@ async def get_user(email: str = Query(...)):
         "message": "User data fetched successfully",
         "data": user_data
     }
+
+# =========================
+# 📦 Activity Model
+# =========================
+
+class ActivityRequest(BaseModel):
+    email: EmailStr
+    workout_mode: str
+    duration: str
+    distance: str
+    calories: str
+    pace: str
+    steps: int
+    best_pace: str
+    date: str
+
+
+# =========================
+# 🚀 Save Activity API
+# =========================
+
+@app.post("/activity")
+async def save_activity(activity: ActivityRequest):
+
+    safe_email = make_safe_email(activity.email)
+
+    ref = db.reference(f"Users/{safe_email}/activity")
+
+    new_activity = {
+        "workout_mode": activity.workout_mode,
+        "duration": activity.duration,
+        "distance": activity.distance,
+        "calories": activity.calories,
+        "pace": activity.pace,
+        "steps": activity.steps,
+        "best_pace": activity.best_pace,
+        "date": activity.date
+    }
+
+    ref.push(new_activity)
+
+    return {"message": "Workout saved successfully"}
